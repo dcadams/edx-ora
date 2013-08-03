@@ -168,8 +168,20 @@ def check_calibration_status(location,student_id):
     if matching_submissions.count() < 1:
         return False, "Invalid problem id specified: {0}".format(location)
 
-    #Get student calibration history and count number of records associated with it
-    calibration_history, created = CalibrationHistory.objects.get_or_create(student_id=student_id, location=location)
+    #Get CalibrationHistories. There should be exactly 0 or 1 for a (student_id, location). 
+    calibrationHistories =  CalibrationHistory.objects.filter(student_id=student_id, location=location).order_by('-id')
+    
+    #If some records already exist, delete all but the first one.
+    if calibrationHistories:
+        for calibrationHistory in calibrationHistories[:len(calibrationHistories)-1]:
+            calibrationHistory.delete()
+        calibration_history = calibrationHistory[0]
+        
+    #If none exist, create one
+    else:
+        calibration_history = CalibrationHistory(student_id=student_id, location=location)
+        calibration_history.save()
+
     max_score = matching_submissions[0].max_score
     calibration_record_count = calibration_history.get_calibration_record_count()
 
