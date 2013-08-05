@@ -175,7 +175,7 @@ def check_calibration_status(location,student_id):
     if calibrationHistories:
         for calibrationHistory in calibrationHistories[:len(calibrationHistories)-1]:
             calibrationHistory.delete()
-        calibration_history = calibrationHistory[0]
+        calibration_history = calibrationHistories[0]
         
     #If none exist, create one
     else:
